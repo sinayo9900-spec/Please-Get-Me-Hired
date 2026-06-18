@@ -46,22 +46,21 @@ Please-Get-Me-Hired/
 │  │  ├─ constant.ts      # .env 로드·검증 후 타입 안전한 상수로 export
 │  │  └─ llm_provider.ts  # LLMProvider 인터페이스 + env 기반 팩토리(어떤 CLI를 쓸지 선택)
 │  ├─ llm/                # provider 구현 (CLI 서브프로세스 실행)
-│  │  ├─ cliProvider.ts   # 공통: 헤드리스 실행 + 출력 파싱 + 동시성 제어
-│  │  ├─ claudeCode.ts    # claude -p ... --output-format json
-│  │  ├─ geminiCli.ts     # gemini -p ...
-│  │  └─ codex.ts         # codex exec ...
-│  ├─ prompts/            # 에이전트 노드용 프롬프트 (함수형 템플릿)
-│  │  ├─ matcher.ts       # matcherPrompt({ roles, posting }) => string
-│  │  └─ summarizer.ts    # summarizerPrompt({ posting }) => string
-│  ├─ agents/             # LangGraph 노드(에이전트)
-│  │  ├─ collector.ts     # 공고 수집
-│  │  ├─ normalizer.ts    # 정규화/중복 제거
-│  │  ├─ matcher.ts       # 직무 연관성 판단 (LLMProvider 호출)
-│  │  ├─ summarizer.ts    # 공고 요약 (LLMProvider 호출)
-│  │  └─ mailer.ts        # 메일 일괄 발송
+│  │  └─ cliProvider.ts   # claude/gemini/codex 헤드리스 실행 + stdin 주입 + 파싱
+│  ├─ prompts/            # 에이전트 프롬프트 (함수형 템플릿)
+│  │  ├─ matcher.ts       # matcherPrompt(profile, posting) => string
+│  │  └─ summarizer.ts    # summarizerPrompt(posting) => string
+│  ├─ agents/             # 파이프라인 단계 로직
+│  │  ├─ normalizer.ts    # 표준화/멱등 키/중복 제거 + selectNew
+│  │  ├─ matcher.ts       # 직무 연관도 채점 + 임계값 필터 (LLMProvider)
+│  │  ├─ summarizer.ts    # 공고 요약 (LLMProvider)
+│  │  └─ mailer.ts        # 메일 일괄 발송 (M3)
+│  ├─ util/
+│  │  └─ pool.ts          # 동시성 제한기 mapLimit
 │  ├─ graph/
-│  │  ├─ state.ts         # 그래프 공유 State 정의
-│  │  └─ pipeline.ts      # StateGraph 조립/엣지
+│  │  ├─ state.ts         # 그래프 공유 State(Annotation.Root)
+│  │  ├─ pipeline.ts      # StateGraph 조립/엣지 + 노드
+│  │  └─ run.ts           # 파이프라인 단일 엔트리 (npm run pipeline)
 │  ├─ collectors/         # 사이트별 수집 어댑터(전략 패턴)
 │  │  ├─ types.ts         # RawJob, CollectorAdapter 인터페이스, 기본 헤더
 │  │  ├─ index.ts         # collect()/collectAll() 디스패처(소스별 실패 격리)
@@ -319,11 +318,11 @@ function getProvider(): LLMProvider;
 
 | 단계 | 내용 | 산출물 |
 |------|------|--------|
-| **M0** | 의존성 설치, Zod 스키마·env 상수, DB 스키마(`profile`+`sources` 포함) + 시드 | `src/config/`, `src/db/` |
-| **M1** | Collector 어댑터(api/html) + DB 소스 3개 연동(peoplenjob/saramin/inthiswork) | `src/collectors/` |
-| **M1.5** | Playwright fallback 어댑터 + 조건부 엣지 | `src/collectors/playwrightAdapter.ts` |
-| **M1.8** | LLMProvider 인터페이스 + CLI provider 1종(헤드리스 실행·파싱·동시성) + 프롬프트 | `src/config/llm_provider.ts`, `src/llm/`, `src/prompts/` |
-| **M2** | LangGraph 파이프라인(normalizer→matcher→summarizer) | `src/graph/`, `src/agents/` |
+| **M0** ✅ | 의존성 설치, Zod 스키마·env 상수, DB 스키마(`profile`+`sources` 포함) + 시드 | `src/config/`, `src/db/` |
+| **M1** ✅ | Collector 어댑터(api/html) + DB 소스 3개 연동(peoplenjob/saramin/inthiswork) | `src/collectors/` |
+| **M1.5** | Playwright fallback 어댑터 (조건부 엣지는 M2에서 배선, 노드는 placeholder) | `src/collectors/playwrightAdapter.ts` |
+| **M1.8** ✅ | LLMProvider 인터페이스 + CLI provider(헤드리스·stdin·파싱) + 프롬프트 | `src/config/llm_provider.ts`, `src/llm/`, `src/prompts/` |
+| **M2** ✅ | LangGraph 파이프라인(normalizer→matcher→summarizer→persist) + 조건부 엣지 | `src/graph/`, `src/agents/` |
 | **M3** | 메일 발송 + 멱등성/로그 | `src/mail/`, `email_runs` |
 | **M4** | 스케줄러 + `npm run pipeline` | `src/scheduler/` |
 | **M5** | 대시보드 백엔드 API | `src/server/` |
