@@ -6,6 +6,8 @@
     "apiClient": "ts-node script/apiClient.ts",
     "migrate": "ts-node src/db/migrate.ts",
     "seed": "ts-node src/db/seed.ts",
+    "seed:sources": "ts-node src/db/seed-sources.ts",
+    "collect": "ts-node src/collectors/run.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
@@ -15,6 +17,7 @@
   },
   "dependencies": {
     "@libsql/client": "^0.17.4",
+    "cheerio": "^1.2.0",
     "dotenv": "^17.4.2",
     "zod": "^4.4.3"
   }

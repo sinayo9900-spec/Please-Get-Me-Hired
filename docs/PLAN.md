@@ -63,16 +63,19 @@ Please-Get-Me-Hired/
 │  │  ├─ state.ts         # 그래프 공유 State 정의
 │  │  └─ pipeline.ts      # StateGraph 조립/엣지
 │  ├─ collectors/         # 사이트별 수집 어댑터(전략 패턴)
-│  │  ├─ types.ts         # JobPosting, CollectorAdapter 인터페이스
-│  │  ├─ apiAdapter.ts    # JSON API 기반 사이트
-│  │  ├─ htmlAdapter.ts   # HTML 스크래핑 기반 사이트
-│  │  └─ playwrightAdapter.ts # 실패 시 fallback (JS 렌더링)
+│  │  ├─ types.ts         # RawJob, CollectorAdapter 인터페이스, 기본 헤더
+│  │  ├─ index.ts         # collect()/collectAll() 디스패처(소스별 실패 격리)
+│  │  ├─ apiAdapter.ts    # JSON API 기반 사이트 (점 경로 추출)
+│  │  ├─ htmlAdapter.ts   # HTML 스크래핑 기반 사이트 (cheerio, "sel@attr" 추출)
+│  │  ├─ run.ts           # DB enabled 소스 수집 실행 (npm run collect)
+│  │  └─ playwrightAdapter.ts # 실패 시 fallback (JS 렌더링, M1.5)
 │  ├─ db/
 │  │  ├─ schema.sql       # 테이블 정의 (profile/sources/job_postings/applications/email_runs)
 │  │  ├─ client.ts        # libSQL 클라이언트 + migrate()
 │  │  ├─ repository.ts    # CRUD 함수 (Row↔도메인 매핑 + Zod 검증)
 │  │  ├─ migrate.ts       # 테이블 생성 엔트리 (npm run migrate)
-│  │  └─ seed.ts          # 기본 profile/source 시드 (npm run seed)
+│  │  ├─ seed.ts          # 기본 profile 시드 (npm run seed)
+│  │  └─ seed-sources.ts  # 실제 수집 소스 시드 (npm run seed:sources)
 │  ├─ mail/
 │  │  └─ transport.ts     # nodemailer 설정 + 템플릿
 │  ├─ scheduler/
@@ -317,7 +320,7 @@ function getProvider(): LLMProvider;
 | 단계 | 내용 | 산출물 |
 |------|------|--------|
 | **M0** | 의존성 설치, Zod 스키마·env 상수, DB 스키마(`profile`+`sources` 포함) + 시드 | `src/config/`, `src/db/` |
-| **M1** | Collector 어댑터(api/html) + DB 소스 1개 연동 | `src/collectors/` |
+| **M1** | Collector 어댑터(api/html) + DB 소스 3개 연동(peoplenjob/saramin/inthiswork) | `src/collectors/` |
 | **M1.5** | Playwright fallback 어댑터 + 조건부 엣지 | `src/collectors/playwrightAdapter.ts` |
 | **M1.8** | LLMProvider 인터페이스 + CLI provider 1종(헤드리스 실행·파싱·동시성) + 프롬프트 | `src/config/llm_provider.ts`, `src/llm/`, `src/prompts/` |
 | **M2** | LangGraph 파이프라인(normalizer→matcher→summarizer) | `src/graph/`, `src/agents/` |
