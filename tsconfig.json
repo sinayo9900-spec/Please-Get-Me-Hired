@@ -9,5 +9,5 @@
     "skipLibCheck": true,
     "outDir": "dist"
   },
-  "include": ["script/**/*.ts"]
+  "include": ["src/**/*.ts", "script/**/*.ts"]
 }
