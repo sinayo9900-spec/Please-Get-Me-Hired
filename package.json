@@ -8,6 +8,7 @@
     "seed": "ts-node src/db/seed.ts",
     "seed:sources": "ts-node src/db/seed-sources.ts",
     "collect": "ts-node src/collectors/run.ts",
+    "pipeline": "ts-node src/graph/run.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
@@ -16,6 +17,8 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@langchain/core": "^1.2.0",
+    "@langchain/langgraph": "^1.4.4",
     "@libsql/client": "^0.17.4",
     "cheerio": "^1.2.0",
     "dotenv": "^17.4.2",
