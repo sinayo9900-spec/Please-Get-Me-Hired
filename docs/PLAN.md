@@ -23,7 +23,7 @@
 | LLM | **로컬 CLI 구독 재활용** — Claude Code / Gemini CLI / Codex를 헤드리스 모드로 서브프로세스 실행 (§6.3) | API 종량과금 회피가 목적 |
 | HTTP 수집 | 기존 `fetch` 래퍼(`script/apiClient.ts`) 재사용 + `cheerio`(HTML 파싱) | API/스크래핑 양쪽 지원 |
 | 동적 페이지 | `playwright` | collector 실패 시 fallback으로 사용 |
-| 저장소 | SQLite + `better-sqlite3` (또는 `prisma`) | 단일 사용자 → 경량 DB로 충분 |
+| 저장소 | SQLite 호환 `@libsql/client` (libSQL) | 사전 빌드 바이너리 — 네이티브 컴파일러 불필요 |
 | 메일 발송 | `nodemailer` (SMTP) 또는 Gmail API | 1차로 SMTP |
 | 스케줄러 | `node-cron` (로컬) / OS 스케줄러 / GitHub Actions | 매일 실행 |
 | 웹 백엔드 | `express` (또는 `fastify`) REST API | DB 노출 |
@@ -68,8 +68,11 @@ Please-Get-Me-Hired/
 │  │  ├─ htmlAdapter.ts   # HTML 스크래핑 기반 사이트
 │  │  └─ playwrightAdapter.ts # 실패 시 fallback (JS 렌더링)
 │  ├─ db/
-│  │  ├─ schema.sql       # 테이블 정의
-│  │  └─ repository.ts    # CRUD 함수
+│  │  ├─ schema.sql       # 테이블 정의 (profile/sources/job_postings/applications/email_runs)
+│  │  ├─ client.ts        # libSQL 클라이언트 + migrate()
+│  │  ├─ repository.ts    # CRUD 함수 (Row↔도메인 매핑 + Zod 검증)
+│  │  ├─ migrate.ts       # 테이블 생성 엔트리 (npm run migrate)
+│  │  └─ seed.ts          # 기본 profile/source 시드 (npm run seed)
 │  ├─ mail/
 │  │  └─ transport.ts     # nodemailer 설정 + 템플릿
 │  ├─ scheduler/
@@ -362,10 +365,13 @@ DASHBOARD_PORT=3000
 ## 13. 의존성 설치 명령 (참고)
 
 ```bash
+# M0(완료): npm i zod dotenv @libsql/client
 npm i @langchain/langgraph @langchain/core \
-      better-sqlite3 cheerio nodemailer node-cron express zod p-limit
-npm i -D @types/better-sqlite3 @types/nodemailer @types/express
+      @libsql/client cheerio nodemailer node-cron express zod dotenv p-limit
+npm i -D @types/nodemailer @types/express
+# @libsql/client는 사전 빌드 바이너리 — Windows에서 VS 빌드 도구 불필요
+#   (better-sqlite3는 네이티브 컴파일이 필요해 제외)
 # LLM은 CLI 구독을 서브프로세스로 호출하므로 @langchain/anthropic 등 API SDK 불필요
-# (child_process 사용). 각 CLI(claude/gemini/codex)는 별도 설치+로그인 전제
+#   (child_process 사용). 각 CLI(claude/gemini/codex)는 별도 설치+로그인 전제
 # 프런트는 web/ 디렉터리에서 별도(Next.js/Vite) 초기화
 ```
