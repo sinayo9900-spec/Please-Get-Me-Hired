@@ -1,6 +1,7 @@
 import { END, START, StateGraph } from '@langchain/langgraph';
 import { collectAll } from '../collectors';
 import { filterByThreshold, matchPostings } from '../agents/matcher';
+import { sendDigest } from '../agents/mailer';
 import { normalize, selectNew } from '../agents/normalizer';
 import { summarizePostings } from '../agents/summarizer';
 import { upsertJobPosting } from '../db/repository';
@@ -49,6 +50,13 @@ async function persistNode(state: PipelineStateType): Promise<Partial<PipelineSt
   return { persistedCount: state.summarized.length };
 }
 
+// mailer: 매칭·요약된 공고를 일괄 메일 발송 + email_runs 기록. 공고 0건이면 skip.
+async function mailerNode(state: PipelineStateType): Promise<Partial<PipelineStateType>> {
+  const result = await sendDigest(state.profile, state.summarized);
+  const errors = result.error ? [`mailer: ${result.error}`] : [];
+  return { emailResult: { sent: result.sent, count: result.count, error: result.error }, errors };
+}
+
 // collector 후 분기: 실패 소스가 있으면 fallback, 없으면 바로 normalizer (PLAN §6.2).
 function routeAfterCollect(state: PipelineStateType): 'fallback' | 'normalizer' {
   return state.failedSources.length > 0 ? 'fallback' : 'normalizer';
@@ -62,6 +70,7 @@ export function buildPipeline() {
     .addNode('matcher', matcherNode)
     .addNode('summarizer', summarizerNode)
     .addNode('persist', persistNode)
+    .addNode('mailer', mailerNode)
     .addEdge(START, 'collector')
     .addConditionalEdges('collector', routeAfterCollect, {
       fallback: 'fallback',
@@ -71,6 +80,7 @@ export function buildPipeline() {
     .addEdge('normalizer', 'matcher')
     .addEdge('matcher', 'summarizer')
     .addEdge('summarizer', 'persist')
-    .addEdge('persist', END)
+    .addEdge('persist', 'mailer')
+    .addEdge('mailer', END)
     .compile();
 }

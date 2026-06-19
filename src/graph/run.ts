@@ -32,6 +32,10 @@ async function main(): Promise<void> {
   console.log(`정규화·신규: ${final.normalized.length}`);
   console.log(`임계값 통과(matched): ${final.matched.length}`);
   console.log(`요약·저장: ${final.persistedCount}`);
+  if (final.emailResult) {
+    const e = final.emailResult;
+    console.log(`메일: ${e.sent ? `발송 ${e.count}건` : e.error ? `실패(${e.error})` : '발송 안 함(0건)'}`);
+  }
   if (final.failedSources.length) {
     console.log(`실패 소스: ${final.failedSources.map((s) => s.id).join(', ')}`);
   }

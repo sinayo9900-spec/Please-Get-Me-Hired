@@ -21,6 +21,10 @@ export const PipelineState = Annotation.Root({
   matched: Annotation<JobPosting[]>({ reducer: replaceReducer, default: () => [] }),
   summarized: Annotation<JobPosting[]>({ reducer: replaceReducer, default: () => [] }),
   persistedCount: Annotation<number>({ reducer: replaceReducer, default: () => 0 }),
+  emailResult: Annotation<{ sent: boolean; count: number; error?: string } | undefined>({
+    reducer: replaceReducer,
+    default: () => undefined,
+  }),
 
   // 비치명적 오류 누적
   errors: Annotation<string[]>({ reducer: appendReducer, default: () => [] }),
