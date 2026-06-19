@@ -327,7 +327,7 @@ function getProvider(): LLMProvider;
 | **M4** ✅ | 스케줄러(node-cron / Windows 작업 스케줄러) + `npm run pipeline` | `src/scheduler/` |
 | **M5** ✅ | 대시보드 백엔드 API (jobs/profile/sources/applications/runs/run) | `src/server/` |
 | **M6** ✅ | 대시보드 프런트(공고 목록 + 지원 현황 칸반) | `web/` |
-| **M7** | 멀티 소스 확장, 통계, 설정 UI | — |
+| **M7** ✅ | 통계 화면 + 설정 UI(프로필/소스 편집) + 멀티 소스 확장 | `src/server/`, `web/` |
 
 ---
 
