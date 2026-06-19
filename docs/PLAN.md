@@ -323,7 +323,7 @@ function getProvider(): LLMProvider;
 | **M1.5** | Playwright fallback 어댑터 (조건부 엣지는 M2에서 배선, 노드는 placeholder) | `src/collectors/playwrightAdapter.ts` |
 | **M1.8** ✅ | LLMProvider 인터페이스 + CLI provider(헤드리스·stdin·파싱) + 프롬프트 | `src/config/llm_provider.ts`, `src/llm/`, `src/prompts/` |
 | **M2** ✅ | LangGraph 파이프라인(normalizer→matcher→summarizer→persist) + 조건부 엣지 | `src/graph/`, `src/agents/` |
-| **M3** | 메일 발송 + 멱등성/로그 | `src/mail/`, `email_runs` |
+| **M3** ✅ | 메일 발송 + 멱등성/로그 (그래프 persist→mailer) | `src/mail/`, `src/agents/mailer.ts` |
 | **M4** | 스케줄러 + `npm run pipeline` | `src/scheduler/` |
 | **M5** | 대시보드 백엔드 API | `src/server/` |
 | **M6** | 대시보드 프런트(공고/지원 보드) | `web/` |
