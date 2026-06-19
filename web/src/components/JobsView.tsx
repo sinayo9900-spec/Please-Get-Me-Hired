@@ -5,18 +5,34 @@ import type { JobPosting } from '../types';
 export function JobsView() {
   const [jobs, setJobs] = useState<JobPosting[]>([]);
   const [minScore, setMinScore] = useState(0);
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
   const [loading, setLoading] = useState(true);
   const [added, setAdded] = useState<Record<string, boolean>>({});
 
   function load() {
     setLoading(true);
     api
-      .getJobs({ minScore: minScore || undefined })
+      .getJobs({ minScore: minScore || undefined, from: from || undefined, to: to || undefined })
       .then(setJobs)
       .finally(() => setLoading(false));
   }
 
-  useEffect(load, [minScore]);
+  useEffect(load, [minScore, from, to]);
+
+  function setRange(days: number) {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - (days - 1));
+    const fmt = (d: Date) => d.toISOString().slice(0, 10);
+    setFrom(fmt(start));
+    setTo(fmt(end));
+  }
+
+  function clearRange() {
+    setFrom('');
+    setTo('');
+  }
 
   async function addToApplications(job: JobPosting) {
     await api.createApplication({ jobId: job.id, status: 'bookmarked' });
@@ -26,6 +42,15 @@ export function JobsView() {
   return (
     <section>
       <div className="toolbar">
+        <label>
+          기간&nbsp;
+          <input type="date" value={from} max={to || undefined} onChange={(e) => setFrom(e.target.value)} />
+          &nbsp;~&nbsp;
+          <input type="date" value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} />
+        </label>
+        <button className="ghost" onClick={() => setRange(7)}>최근 7일</button>
+        <button className="ghost" onClick={() => setRange(30)}>최근 30일</button>
+        <button className="ghost" onClick={clearRange}>전체 기간</button>
         <label>
           최소 적합도&nbsp;
           <select value={minScore} onChange={(e) => setMinScore(Number(e.target.value))}>

@@ -48,9 +48,11 @@ export function createServer() {
   app.get(
     '/api/jobs',
     wrap(async (req, res) => {
-      const { date, minScore, source } = req.query;
+      const { date, from, to, minScore, source } = req.query;
       const jobs = await listJobPostings({
         collectedOn: typeof date === 'string' ? date : undefined,
+        from: typeof from === 'string' ? from : undefined,
+        to: typeof to === 'string' ? to : undefined,
         minScore: typeof minScore === 'string' ? Number(minScore) : undefined,
         source: typeof source === 'string' ? source : undefined,
       });

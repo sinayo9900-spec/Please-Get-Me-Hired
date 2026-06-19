@@ -151,7 +151,9 @@ export async function getJobPosting(id: string): Promise<JobPosting | null> {
 }
 
 export interface JobPostingFilter {
-  collectedOn?: string; // YYYY-MM-DD (collected_at prefix)
+  collectedOn?: string; // YYYY-MM-DD 단일 일자
+  from?: string; // YYYY-MM-DD 기간 시작(포함)
+  to?: string; // YYYY-MM-DD 기간 끝(포함)
   minScore?: number;
   source?: string;
 }
@@ -159,9 +161,20 @@ export interface JobPostingFilter {
 export async function listJobPostings(filter: JobPostingFilter = {}): Promise<JobPosting[]> {
   const where: string[] = [];
   const args: InValue[] = [];
+  // 수집일 기준 필터. 날짜만 비교하도록 collected_at의 앞 10자(YYYY-MM-DD)를 사용.
+  const day = "substr(collected_at, 1, 10)";
   if (filter.collectedOn) {
-    where.push('collected_at LIKE ?');
-    args.push(`${filter.collectedOn}%`);
+    where.push(`${day} = ?`);
+    args.push(filter.collectedOn);
+  } else {
+    if (filter.from) {
+      where.push(`${day} >= ?`);
+      args.push(filter.from);
+    }
+    if (filter.to) {
+      where.push(`${day} <= ?`);
+      args.push(filter.to);
+    }
   }
   if (filter.minScore != null) {
     where.push('match_score >= ?');

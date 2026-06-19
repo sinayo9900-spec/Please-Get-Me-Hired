@@ -22,10 +22,11 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  getJobs: (params: { minScore?: number; date?: string } = {}) => {
+  getJobs: (params: { minScore?: number; from?: string; to?: string } = {}) => {
     const q = new URLSearchParams();
     if (params.minScore != null) q.set('minScore', String(params.minScore));
-    if (params.date) q.set('date', params.date);
+    if (params.from) q.set('from', params.from);
+    if (params.to) q.set('to', params.to);
     const qs = q.toString();
     return req<JobPosting[]>(`/api/jobs${qs ? `?${qs}` : ''}`);
   },
