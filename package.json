@@ -9,10 +9,12 @@
     "seed:sources": "ts-node src/db/seed-sources.ts",
     "collect": "ts-node src/collectors/run.ts",
     "pipeline": "ts-node src/graph/run.ts",
+    "schedule": "ts-node src/scheduler/cron.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
+    "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^8.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
@@ -23,6 +25,7 @@
     "@libsql/client": "^0.17.4",
     "cheerio": "^1.2.0",
     "dotenv": "^17.4.2",
+    "node-cron": "^4.4.1",
     "nodemailer": "^9.0.1",
     "zod": "^4.4.3"
   }

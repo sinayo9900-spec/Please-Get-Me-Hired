@@ -20,6 +20,10 @@ const EnvSchema = z.object({
   // 저장소 / 서버
   DATABASE_URL: z.string().min(1).default('file:./data/app.db'),
   DASHBOARD_PORT: z.coerce.number().int().positive().default(3000),
+
+  // 스케줄러 (node-cron). 기본: 매일 08:00 KST
+  SCHEDULE_CRON: z.string().min(1).default('0 8 * * *'),
+  SCHEDULE_TZ: z.string().min(1).default('Asia/Seoul'),
 });
 
 export type Env = z.infer<typeof EnvSchema>;
