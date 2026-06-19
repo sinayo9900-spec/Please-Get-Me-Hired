@@ -1,0 +1,91 @@
+:root {
+  --bg: #f7f8fa;
+  --card: #fff;
+  --border: #e5e7eb;
+  --text: #1f2330;
+  --muted: #8b909c;
+  --accent: #1a73e8;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", Roboto, "Malgun Gothic", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+.app { max-width: 1100px; margin: 0 auto; padding: 20px; }
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.header h1 { font-size: 22px; margin: 0; }
+.muted { color: var(--muted); font-size: 13px; }
+
+button {
+  cursor: pointer;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+button:disabled { opacity: 0.5; cursor: default; }
+button.ghost { background: #fff; color: var(--accent); }
+
+.banner {
+  margin: 12px 0;
+  padding: 10px 14px;
+  background: #e8f0fe;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.tabs { display: flex; gap: 8px; margin: 16px 0; }
+.tabs button { background: #fff; color: var(--text); border: 1px solid var(--border); }
+.tabs button.active { background: var(--text); color: #fff; border-color: var(--text); }
+
+.toolbar { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+select { padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border); }
+
+.cards { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+}
+.card-meta { font-size: 12px; color: var(--muted); }
+.card-title {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  margin: 4px 0;
+}
+.card-reason { font-size: 13px; color: #555; margin: 4px 0; }
+.card-summary { font-size: 13px; margin: 4px 0 10px; }
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(120px, 1fr));
+  gap: 10px;
+  overflow-x: auto;
+}
+.column { background: #eef0f3; border-radius: 10px; padding: 8px; min-height: 120px; }
+.column h3 { font-size: 13px; margin: 4px 6px 8px; }
+.app-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+.app-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.app-card select { width: 100%; margin-top: 6px; font-size: 12px; }
+.empty { text-align: center; padding: 12px 0; }
