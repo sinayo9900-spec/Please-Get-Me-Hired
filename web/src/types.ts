@@ -65,3 +65,21 @@ export interface EmailRun {
   error?: string;
   createdAt: string;
 }
+
+export interface Source {
+  id: string;
+  name: string;
+  type: 'api' | 'html';
+  request: { url: string; method?: 'GET' | 'POST'; headers?: Record<string, string>; body?: string };
+  select: { list: string; fields: Record<string, string> };
+  enabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Stats {
+  jobsByDate: { date: string; count: number }[];
+  jobsBySource: { source: string; count: number }[];
+  applicationsByStatus: { status: string; count: number }[];
+  totals: { jobs: number; applications: number; runs: number };
+}

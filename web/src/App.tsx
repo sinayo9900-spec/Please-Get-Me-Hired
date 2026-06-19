@@ -3,8 +3,10 @@ import { api } from './api';
 import type { Profile } from './types';
 import { JobsView } from './components/JobsView';
 import { ApplicationsBoard } from './components/ApplicationsBoard';
+import { StatsView } from './components/StatsView';
+import { SettingsView } from './components/SettingsView';
 
-type Tab = 'jobs' | 'applications';
+type Tab = 'jobs' | 'applications' | 'stats' | 'settings';
 
 export function App() {
   const [tab, setTab] = useState<Tab>('jobs');
@@ -57,9 +59,20 @@ export function App() {
         >
           지원 현황
         </button>
+        <button className={tab === 'stats' ? 'active' : ''} onClick={() => setTab('stats')}>
+          통계
+        </button>
+        <button className={tab === 'settings' ? 'active' : ''} onClick={() => setTab('settings')}>
+          설정
+        </button>
       </nav>
 
-      <main>{tab === 'jobs' ? <JobsView /> : <ApplicationsBoard />}</main>
+      <main>
+        {tab === 'jobs' && <JobsView />}
+        {tab === 'applications' && <ApplicationsBoard />}
+        {tab === 'stats' && <StatsView />}
+        {tab === 'settings' && <SettingsView />}
+      </main>
     </div>
   );
 }

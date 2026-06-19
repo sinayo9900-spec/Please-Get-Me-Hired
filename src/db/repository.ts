@@ -307,3 +307,37 @@ export async function listEmailRuns(limit = 30): Promise<EmailRun[]> {
   });
   return res.rows.map(rowToEmailRun);
 }
+
+// ── Stats (대시보드 통계) ──────────────────────────────────────
+
+export interface Stats {
+  jobsByDate: { date: string; count: number }[];
+  jobsBySource: { source: string; count: number }[];
+  applicationsByStatus: { status: string; count: number }[];
+  totals: { jobs: number; applications: number; runs: number };
+}
+
+export async function getStats(): Promise<Stats> {
+  const [byDate, bySource, byStatus, totals] = await Promise.all([
+    db.execute(
+      `SELECT substr(collected_at, 1, 10) AS d, COUNT(*) AS c
+       FROM job_postings GROUP BY d ORDER BY d DESC LIMIT 14`,
+    ),
+    db.execute(`SELECT source AS s, COUNT(*) AS c FROM job_postings GROUP BY s ORDER BY c DESC`),
+    db.execute(`SELECT status AS s, COUNT(*) AS c FROM applications GROUP BY s`),
+    db.execute(
+      `SELECT
+         (SELECT COUNT(*) FROM job_postings) AS jobs,
+         (SELECT COUNT(*) FROM applications) AS applications,
+         (SELECT COUNT(*) FROM email_runs) AS runs`,
+    ),
+  ]);
+
+  const t = totals.rows[0];
+  return {
+    jobsByDate: byDate.rows.map((r) => ({ date: str(r.d), count: num(r.c) })).reverse(),
+    jobsBySource: bySource.rows.map((r) => ({ source: str(r.s), count: num(r.c) })),
+    applicationsByStatus: byStatus.rows.map((r) => ({ status: str(r.s), count: num(r.c) })),
+    totals: { jobs: num(t.jobs), applications: num(t.applications), runs: num(t.runs) },
+  };
+}

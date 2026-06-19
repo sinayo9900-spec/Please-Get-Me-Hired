@@ -1,4 +1,12 @@
-import type { Application, ApplicationStatus, EmailRun, JobPosting, Profile } from './types';
+import type {
+  Application,
+  ApplicationStatus,
+  EmailRun,
+  JobPosting,
+  Profile,
+  Source,
+  Stats,
+} from './types';
 
 // vite dev proxy(/api → :3000) 사용. 빌드 배포 시 VITE_API_BASE로 절대 URL 지정 가능.
 const BASE = import.meta.env.VITE_API_BASE ?? '';
@@ -29,4 +37,16 @@ export const api = {
     req<Application>(`/api/applications/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
   getRuns: () => req<EmailRun[]>('/api/runs'),
   runPipeline: () => req<{ started: boolean }>('/api/run', { method: 'POST', body: '{}' }),
+
+  updateProfile: (body: Partial<Profile>) =>
+    req<Profile>('/api/profile', { method: 'PUT', body: JSON.stringify(body) }),
+
+  getSources: () => req<Source[]>('/api/sources'),
+  createSource: (body: Omit<Source, 'createdAt' | 'updatedAt'>) =>
+    req<Source>('/api/sources', { method: 'POST', body: JSON.stringify(body) }),
+  updateSource: (id: string, body: Partial<Source>) =>
+    req<Source>(`/api/sources/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+  deleteSource: (id: string) => req<void>(`/api/sources/${id}`, { method: 'DELETE' }),
+
+  getStats: () => req<Stats>('/api/stats'),
 };

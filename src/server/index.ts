@@ -13,6 +13,7 @@ import {
   getJobPosting,
   getProfile,
   getSource,
+  getStats,
   listApplications,
   listEmailRuns,
   listJobPostings,
@@ -181,6 +182,12 @@ export function createServer() {
   app.get(
     '/api/runs',
     wrap(async (_req, res) => res.json(await listEmailRuns())),
+  );
+
+  // ── 통계 ─────────────────────────────────────────────
+  app.get(
+    '/api/stats',
+    wrap(async (_req, res) => res.json(await getStats())),
   );
 
   // ── 파이프라인 수동 실행(비동기 트리거) ──────────────
