@@ -11,6 +11,7 @@
     "pipeline": "ts-node src/graph/run.ts",
     "schedule": "ts-node src/scheduler/cron.ts",
     "serve": "ts-node src/server/index.ts",
+    "stop:dev": "node scripts/stop-dev.mjs",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
