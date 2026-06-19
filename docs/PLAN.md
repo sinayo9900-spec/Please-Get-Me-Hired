@@ -326,7 +326,7 @@ function getProvider(): LLMProvider;
 | **M3** ✅ | 메일 발송 + 멱등성/로그 (그래프 persist→mailer) | `src/mail/`, `src/agents/mailer.ts` |
 | **M4** ✅ | 스케줄러(node-cron / Windows 작업 스케줄러) + `npm run pipeline` | `src/scheduler/` |
 | **M5** ✅ | 대시보드 백엔드 API (jobs/profile/sources/applications/runs/run) | `src/server/` |
-| **M6** | 대시보드 프런트(공고/지원 보드) | `web/` |
+| **M6** ✅ | 대시보드 프런트(공고 목록 + 지원 현황 칸반) | `web/` |
 | **M7** | 멀티 소스 확장, 통계, 설정 UI | — |
 
 ---
